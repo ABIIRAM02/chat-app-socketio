@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates&family=Preahvihear&family=Satisfy&family=Teko&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hide-scrollbar::-webkit-scrollbar {
+    width: 5px; /* Adjust the width as needed */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent; /* Make the track transparent */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Make the thumb transparent */
+  }
