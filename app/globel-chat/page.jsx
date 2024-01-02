@@ -1,19 +1,22 @@
 "use client";
+import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 
 const GlobelChat = () => {
   const [userId, setUserId] = useState("");
+  const [userData, setUserData] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [chatData, setChatData] = useState([]);
-  const containerRef = useRef()
+  const containerRef = useRef();
+  const { data: session } = useSession();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (message) socket.emit("sendMsg", message);
+    if (message) socket.emit("sendMsg", {message : message , name : session?.user?.name});
 
     setMessage("");
   };
@@ -23,32 +26,50 @@ const GlobelChat = () => {
   };
 
   const scrollToBottom = () => {
-
-    if (containerRef.current){
-        containerRef.current.scrollTop = containerRef.current.scrollHeight
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-    
-  }
+  };
+
+  const sessionData = { name: session?.user.name, email: session?.user.email , img: session?.user?.image };
 
   useEffect(() => {
-    const socket = io("http://localhost:3001");
+    const socket = io("http://localhost:3001", {
+      query: {
+        userId: sessionData.email,
+      },
+    });
     socket.on("userID", (data) => setUserId(data));
     setSocket(socket);
-    socket.on("activeUsers", (data) =>
-      setActiveUsers((prev) => [...prev, data])
-    );
-  }, []);
+
+    socket.on("activeUsers", (data) => setActiveUsers(data));
+
+    socket.emit("newUser", sessionData);
+  }, [sessionData?.name]);
 
   useEffect(() => {
     if (socket)
       socket.on("reciveMsg", (data) => {
         setChatData((prev) => [...prev, data]);
-        scrollToBottom()
+        scrollToBottom();
       });
   }, [socket]);
 
+  const fetchUsers = async () => {
+    const data = await fetch("api/users");
+    const res = await data.json();
+
+    setUserData(res);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  console.log(activeUsers);
+
   return (
-    <section className="h-screen bg-MyBlue font-most ">
+    session?.user.name && <section className="h-screen bg-MyBlue font-most ">
       <main className=" w-full h-full flex">
         <div className="h-full flex-[0.4] bg-myBlack"></div>
         <div className="flex-[2] bg-myDarkBlue overflow-hidden ">
@@ -69,10 +90,10 @@ const GlobelChat = () => {
                 title="Tab to Chat"
                 className="flex flex-col gap-4 w-full cursor-pointer font-some overflow-y-auto h-full hide-scrollbar  overflow-hidden"
               >
-                {activeUsers.map(() => (
+                {activeUsers.map((data) => (
                   <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                    <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                    <h2 className="fontsem">Abi ram</h2>
+                    <img src={data.img} className="ml-10 w-10 h-10 border border-MyBlue rounded-full bg-myWhite"/>
+                    <h2 className="fontsem">{data.name}</h2>
                   </main>
                 ))}
               </div>
@@ -83,57 +104,32 @@ const GlobelChat = () => {
                 Chat Members :
               </h2>
               <div
-                title="Tab to Chat"
                 className="flex flex-col gap-4 w-full cursor-pointer font-some overflow-y-auto h-full hide-scrollbar overflow-hidden"
               >
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
-                <main className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
-                  <div className="ml-10 w-10 h-10 border rounded-full bg-myWhite"></div>
-                  <h2 className="fontsem">Abi ram</h2>
-                </main>
+                { userData && userData.map((data, index) => (
+                  <main key={index} className="w-4/5 mx-auto rounded-lg bg-myLightBlue p-3 flex gap-5 items-center text-lg">
+                    <img src={data?.image} className="ml-10 w-10 h-10 border border-MyBlue rounded-full bg-myWhite" />
+                    <h2 className="fontsem capitalize">{data?.name}</h2>
+                  </main>
+                ))}
               </div>
             </section>
           </section>
         </div>
         <section className="h-full flex-[3] bg-MyBlue flex flex-col justify-between">
           <div className="h-[4rem] flex justify-evenly items-center bg-myLightBlue w-full ">
-          
             <h2 className="font-myCursive text-myWhite text-2xl">
               Globel Chat
             </h2>
           </div>
 
-            <main ref={containerRef} className="flex-1 relative overflow-hidden text-sm overflow-y-auto hide-scrollbar" >
+          <main
+            ref={containerRef}
+            className="flex-1 relative overflow-hidden text-sm overflow-y-auto hide-scrollbar"
+          >
             <section className="flex justify-end items-end absolute bottom-0 w-full">
               {chatData[0] && (
-                <div className='flex pt-[9rem] max-h-screen flex-col gap-2 m-2 w-full mt-8'>
+                <div className="flex pt-[9rem] max-h-screen flex-col gap-2 m-2 w-full mt-8">
                   {chatData.map((data, index) => (
                     <main>
                       {data.user !== userId && (
@@ -146,7 +142,7 @@ const GlobelChat = () => {
                           >
                             <div className="flex text-xs pr-1 mb-1 gap-3 justify-between">
                               <h2 className=" font-semibold text-myGray ">
-                                Abii
+                                {data.name}
                               </h2>
                               <h2 className="opacity-70 text-[0.65rem]">
                                 {data.time}
@@ -166,7 +162,7 @@ const GlobelChat = () => {
                           >
                             <div className="flex text-xs pr-1 mb-1 gap-3 justify-between">
                               <h2 className=" font-semibold text-myGray ">
-                                Abii
+                                {data.name}
                               </h2>
                               <h2 className="opacity-70 text-[0.65rem]">
                                 {data.time}
@@ -181,7 +177,7 @@ const GlobelChat = () => {
                 </div>
               )}
             </section>
-            </main>
+          </main>
 
           <div className="h-[3rem] bg-myLightBlue w-11/12 mx-auto rounded-md mb-[.5rem]">
             <section className="flex items-center gap-5 h-full p-3">
