@@ -11,7 +11,6 @@ module.exports = {
         myWhite:'#E8E6DD',
         myGray:'#7B8EBC',
         myBrown:'#313131',
-        myPink:'#C426AD',
         myLightBlue:'#141A28',
         MyBlue:'#1A202F',
         myDarkBlue:'#111620',
@@ -20,8 +19,9 @@ module.exports = {
       },
       fontFamily:{
         most:'Preahvihear',
-        some: 'Montserrat Alternates',
+        some: 'Inclusive Sans',
         few: 'Teko',
+        big: 'oi',
         myCursive:'Satisfy'      
       }
     },

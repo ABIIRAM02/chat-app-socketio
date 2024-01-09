@@ -1,17 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates&family=Preahvihear&family=Satisfy&family=Teko&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Oi&family=Preahvihear&family=Satisfy&family=Teko&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+.myUnderline::after{
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  background-image: url(https://www.beyondcss.dev/underline.svg);
+  background-position:center ;
+  background-size: cover;
+  background-repeat: no-repeat;
+  bottom: -10px;
+  left: 0;
+}
+
+.bg-radial-gradient {
+  background: radial-gradient(circle,  lightblue , #E8E6DD);
+}
+
 .hide-scrollbar::-webkit-scrollbar {
-    width: 5px; /* Adjust the width as needed */
+    width: 0px; /* Adjust the width as needed */
   }
   
   .hide-scrollbar::-webkit-scrollbar-track {
-    background-color: transparent; /* Make the track transparent */
+    background-color: transparent; 
+
   }
   
   .hide-scrollbar::-webkit-scrollbar-thumb {
     background-color: transparent; /* Make the thumb transparent */
+  }
+
+  .hide-active-scrollbar::-webkit-scrollbar {
+    width: 5px; /* Adjust the width as needed */
+  }
+
+  .hide-active-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #7B8EBC; 
+    border-radius: 20px;
   }

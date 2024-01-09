@@ -16,6 +16,8 @@ const handler = NextAuth({
     callbacks: {
         async signIn({ profile }) {
 
+            console.log('profile');
+
             try {
                 connectToDB()
 
@@ -25,7 +27,7 @@ const handler = NextAuth({
 
             if(!userExist){
                     await User.create({
-                    name :profile.given_name.toLowerCase() + profile.family_name.toLowerCase(),
+                    name :profile.name,
                     email:profile.email,
                     image:profile.picture
                 })

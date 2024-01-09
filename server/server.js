@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 
+
 const activeUsersSchema = new mongoose.Schema({
   name: String,
   img:String,
@@ -38,7 +39,6 @@ try {
 }
 
 const ActiveUser = mongoose.model("activeUser", activeUsersSchema);
-let currentUser ;
 
 io.on("connection", async (socket) => {
   socket.emit("userID", socket.id);
@@ -76,15 +76,14 @@ io.on("connection", async (socket) => {
       minute: "2-digit",
       hour12: true,
     });
-    io.emit("reciveMsg", { user: socket.id, message: data.message, time: timestamp , name:data.name });
+    io.emit("reciveMsg", { user: socket.id, message: data.message, time: timestamp , name:data.name , email:data.email});
   });
 
   socket.on('disconnect' , async () => {
 
      await ActiveUser.findOneAndDelete({email:user})
      const activeUsersData = await ActiveUser.find();
-     const activeUsers = activeUsersData.map((user) => user.name);
-     io.emit("activeUsers", activeUsers);
+     io.emit("activeUsers", activeUsersData);
 
   })
 
