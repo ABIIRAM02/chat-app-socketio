@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-
+require('dotenv').config();
 
 const activeUsersSchema = new mongoose.Schema({
   name: String,
@@ -8,7 +8,7 @@ const activeUsersSchema = new mongoose.Schema({
 });
 
 const io = require("socket.io")(3001, {
-  cors: {
+  cors: { 
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
@@ -25,8 +25,8 @@ if (isConnected) {
 
 try {
   mongoose
-    .connect("mongodb://localhost:27017", {
-      dbName: "chat-dood",
+  .connect(process.env.MONGODB_URI, {
+    dbName: "Globel-Chat",
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })

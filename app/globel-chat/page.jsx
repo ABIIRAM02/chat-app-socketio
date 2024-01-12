@@ -24,6 +24,34 @@ const GlobelChat = () => {
     email: session?.user.email,
     img: session?.user?.image,
   };
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    setPosition({
+      y: touch.clientY - e.target.offsetBottom,
+    });
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (isDragging) {
+      const touch = e.touches[0];
+      let newY = window.innerHeight - touch.clientY;
+
+      // Ensure the draggable input stays within the container width
+      newY = Math.max(0, Math.min(newY, window.innerHeight - 100));
+
+      setPosition({
+        y: newY,
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -55,16 +83,8 @@ const GlobelChat = () => {
     setUserInfoIndex(index);
   };
 
-  const handleImageUploadClick = () => {
-    picRef.current.click();
-  };
-
-  const handleImageUpload = (e) => {
-    const img = e.target.files[0];
-  };
-
   const handleOnsignOut = async () => {
-      await signOut({ redirect: false, callbackUrl: '/' });
+    await signOut({ redirect: "/", callbackUrl: "/" });
   };
 
   const saveMsgToDB = async (data) => {
@@ -105,8 +125,6 @@ const GlobelChat = () => {
       }
     }
   }, [usersData]);
-
-  console.log(currentUserIndex, userInfoIndex);
 
   const fetchMessageData = async () => {
     const data = await fetch("api/message");
@@ -154,14 +172,18 @@ const GlobelChat = () => {
     fetchMessageData();
   }, []);
 
+  if (session === null) {
+    router.replace("/");
+    return null;
+  }
 
   return (
     session?.user.name && (
       <section className="h-screen bg-MyBlue font-most ">
         <main className=" w-full h-full flex">
-          <div className="h-full flex-[0.4] bg-myBlack"></div>
+          <div className="h-full xl:flex-[0.4] bg-myBlack"></div>
 
-          <div className="flex-[2] bg-myDarkBlue overflow-hidden ">
+          <div className="hidden md:flex flex-col flex-[2] bg-myDarkBlue overflow-hidden ">
             <div className="h-[4rem] w-full flex justify-center items-end">
               <input
                 type="text"
@@ -219,9 +241,26 @@ const GlobelChat = () => {
               </section>
             </section>
           </div>
-          <section className="h-full flex-[3] bg-MyBlue flex flex-col justify-between">
-            <div className="h-[4rem] flex justify-around items-center bg-myLightBlue w-full ">
-              <h2 className="font-myCursive text-myWhite text-2xl">
+
+          <section className="h-full flex-[3] bg-myLightBlue flex flex-col justify-between">
+            <div className="h-[4rem] gap-2 justify-between flex px-[1rem] items-center bg-myLightBlue w-full ">
+              <div className="md:hidden flex gap-2 items-center ">
+                <img
+                  src={sessionData.img}
+                  className="h-10 w-10 rounded-full border border-myWhite"
+                  alt=""
+                />
+                <h2 className="font-few uppercase text-2xl text-myGray">
+                  {sessionData.name}
+                </h2>
+              </div>
+
+              <h2
+                onClick={() => {
+                  router.push("/");
+                }}
+                className="font-myCursive md:mx-auto text-myBrown font-bold text-lg bg-myWhite px-3 rounded-2xl cursor-pointer"
+              >
                 Globel Chat
               </h2>
             </div>
@@ -230,7 +269,7 @@ const GlobelChat = () => {
               ref={containerRef}
               className="flex-1 relative overflow-hidden text-sm overflow-y-auto hide-scrollbar"
             >
-              <div className="w-full bg-myBlack flex gap-1 flex-col justify-center items-center p-2 text-center">
+              <div className="w-full bg-myBlack sticky top-0 z-10 flex gap-1 flex-col justify-center items-center p-2 text-center">
                 <p className="text-myBrown">
                   Hii {sessionData.name.split(" ")[0]} , Leave a Message : )
                 </p>
@@ -241,7 +280,7 @@ const GlobelChat = () => {
               </div>
               <section className="flex justify-end items-end absolute bottom-0 w-full">
                 {chatData[0] && (
-                  <div className="flex pt-[9rem] max-h-screen flex-col gap-2 m-1 w-full mt-8">
+                  <div className="flex md:pb-0 pb-[4rem] pt-[9rem] max-h-screen flex-col gap-2 m-1 w-full mt-8">
                     {chatData.map((data, index) => (
                       <main>
                         {sessionData?.email !== data.email && (
@@ -291,69 +330,60 @@ const GlobelChat = () => {
               </section>
             </main>
 
-            <div className="h-[3rem] bg-myLightBlue w-11/12 mx-auto rounded-md my-[.5rem]">
-              <section className="flex items-center gap-5 h-full p-3">
-                <svg
-                  onClick={handleImageUploadClick}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  data-slot="icon"
-                  class="w-8 text-myGray cursor-pointer"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                  />
-                </svg>
-                <input
-                  type="file"
-                  hidden
-                  ref={picRef}
-                  onChange={handleImageUpload}
-                />
-                <form
-                  onSubmit={handleSubmit}
-                  className="flex justify-between w-full items-center"
-                >
-                  <input
-                    onChange={handleMessage}
-                    value={message}
-                    placeholder="Type a Msg..."
-                    className="w-5/6 font-sans text- outline-none bg-myLightBlue text-white rounded-sm placeholder:text-myGray placeholder:text-base"
-                    type="text"
-                  />
-                  <button
-                    type="submit"
-                    className="w-1/6 flex justify-center items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      data-slot="icon"
-                      class="w-6 text-myGray "
+            <section className=" overflow-hidden flex justify-center z-20">
+              <div
+                style={{
+                  bottom: position.y,
+                }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                className=" overflow-hidden md:sticky fixed w-full"
+              >
+                <main className="md:my-[.5rem] my-[1rem] flex flex-col justify-center items-center w-full" >
+                  <span className="md:hidden bg-myGray text-center px-10 font-bold rounded-t-xl" >Drag Me</span>
+                  <section className="flex items-center p-3 h-[3rem] border-2 border-myGray w-11/12 rounded-full  mx-auto">
+                    <form
+                      onSubmit={handleSubmit}
+                      className="flex w-full justify-around items-center "
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                      <input
+                        onChange={handleMessage}
+                        value={message}
+                        placeholder="Type a Msg..."
+                        className="w-5/6 font-sans outline-none bg-transparent text-white rounded-sm placeholder:text-myGray placeholder:text-base "
+                        type="text"
                       />
-                    </svg>
-                  </button>
-                </form>
-              </section>
-            </div>
+                      <button
+                        type="submit"
+                        className="flex justify-center items-center"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          data-slot="icon"
+                          class="w-6 text-myGray "
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                          />
+                        </svg>
+                      </button>
+                    </form>
+                  </section>
+                </main>
+              </div>
+            </section>
           </section>
 
-          <div className="h-full flex-[1.5] bg-myBlack flex items-center justify-center">
+          <div className="h-full hidden flex-[1.5] bg-myDarkBlue lg:flex items-center justify-center">
             {userInfoIndex >= 0 && (
-              <section className="flex flex-col gap-3 h-3/4 w-11/12 p-3 py-5 border border-myBrown rounded-lg relative">
+              <section className="flex flex-col gap-3 h-3/4 w-11/12 p-3 py-5 bg-myBlack border border-myBrown rounded-lg relative">
                 {sessionData.email !== usersData[userInfoIndex]?.email && (
                   <svg
                     onClick={() => {
