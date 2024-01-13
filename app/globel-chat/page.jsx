@@ -13,11 +13,8 @@ const GlobelChat = () => {
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [chatData, setChatData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState();
   const router = useRouter();
   const containerRef = useRef();
-  const picRef = useRef();
   const { data: session } = useSession();
   const sessionData = {
     name: session?.user.name,
@@ -40,7 +37,6 @@ const GlobelChat = () => {
       const touch = e.touches[0];
       let newY = window.innerHeight - touch.clientY;
 
-      // Ensure the draggable input stays within the container width
       newY = Math.max(0, Math.min(newY, window.innerHeight - 100));
 
       setPosition({
@@ -136,7 +132,7 @@ const GlobelChat = () => {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:3001", {
+    const socket = io("https://globel-chat-server.onrender.com", {
       query: {
         userId: sessionData.email,
       },
@@ -154,9 +150,9 @@ const GlobelChat = () => {
       socket.on("reciveMsg", (data) => {
         setChatData((prev) => [...prev, data]);
         scrollToBottom();
-        // if (data.user === userId) {
-        //   saveMsgToDB(data);
-        // }
+        if (data.user === userId) {
+          saveMsgToDB(data);
+        }
       });
       return () => {
         socket.off("reciveMsg");
