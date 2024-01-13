@@ -1,12 +1,6 @@
 const { default: mongoose } = require("mongoose");
 require('dotenv').config();
 
-const activeUsersSchema = new mongoose.Schema({
-  name: String,
-  img:String,
-  email: String,
-});
-
 const io = require("socket.io")(3001, {
   cors: { 
     origin: "http://localhost:3000",
@@ -15,6 +9,13 @@ const io = require("socket.io")(3001, {
 });
 
 let isConnected = false;
+
+const activeUsersSchema = new mongoose.Schema({
+  name: String,
+  img:String,
+  email: String,
+});
+
 
 mongoose.set("strictQuery", false);
 
