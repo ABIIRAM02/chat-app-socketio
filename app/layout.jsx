@@ -1,5 +1,5 @@
 import "../styles/globels.css";
-import Provider from "@/Components/Providers";
+import Provider from "@Components/Providers";
 import { ReduxProvider } from "./GlobalRedux/ReduxProvider";
 
 export const metadata = {

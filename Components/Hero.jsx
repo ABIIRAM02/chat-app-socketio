@@ -1,8 +1,6 @@
 'use client'
-import Lottie from "lottie-react";
-import Animi from "../assets/Animation.json";
-
 import { signIn, signOut, useSession } from "next-auth/react";
+import LottieAnime from "./LottieAnime";
 
 const Hero = () => {
 
@@ -45,12 +43,9 @@ const Hero = () => {
         </text>
       </g>
     </svg>
-    <Lottie
-      className="lg:h-3/4 md:h-2/4"
-      loop={false}
-      autoPlay={true}
-      animationData={Animi}
-    />
+
+      <LottieAnime />
+  
     {!session ? (
     <main className="absolute bottom-10 flex flex-col items-center" >
         <p className=" md:p-0 p-2 text-center font-most text-myBrown mb-2">
