@@ -42,7 +42,6 @@ const Home = () => {
           to get started.!
         </p>
         <h2
-          onClick={handleOnsignIn}
           className="font-few text-2xl myUnderline relative cursor-pointer"
         >
           Click to Login
