@@ -1,6 +1,6 @@
 'use client'
 import { signIn, signOut, useSession } from "next-auth/react";
-// import LottieAnime from "./LottieAnime";
+import LottieAnime from "./LottieAnime";
 
 const Hero = () => {
 
@@ -44,7 +44,7 @@ const Hero = () => {
       </g>
     </svg>
 
-      {/* <LottieAnime /> */}
+      <LottieAnime />
   
     {!session ? (
     <main className="absolute bottom-10 flex flex-col items-center" >
