@@ -55,6 +55,7 @@ const Home = () => {
   >
     Wanna Log-out {session?.user?.name.split(' ')[0]} .?
   </h2>} */}
+  <Hero />
   </section>
   );
 };
