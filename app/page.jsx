@@ -1,5 +1,7 @@
 // import Hero from "@Components/Hero";
 
+import LottieAnime from "@Components/LottieAnime";
+
 const Home = () => {
 
   return (
@@ -33,7 +35,7 @@ const Home = () => {
       </g>
     </svg>
 
-      {/* <LottieAnime /> */}
+      <LottieAnime />
   
     {/* {!session ? ( */}
     <main className="absolute bottom-10 flex flex-col items-center" >
