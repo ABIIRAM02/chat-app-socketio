@@ -7,7 +7,7 @@ const activeUsersSchema = new mongoose.Schema({
   email: String,
 });
 
-const io = require("socket.io")(process.env.PORT || 3001, {
+const io = require("socket.io")( 3001 || process.env.PORT , {
   cors: { 
     origin: process.env.CLIENT || "http://localhost:3000",
     methods: ["GET", "POST"],
