@@ -16,8 +16,6 @@ const handler = NextAuth({
     callbacks: {
         async signIn({ profile }) {
 
-            console.log('profile');
-
             try {
                 connectToDB()
 
