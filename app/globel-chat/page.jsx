@@ -3,6 +3,8 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import Loading from '../../assets/loading.json'
+import Lottie from "lottie-react";
 
 const GlobelChat = () => {
   const [userId, setUserId] = useState("");
@@ -13,6 +15,7 @@ const GlobelChat = () => {
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [chatData, setChatData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const containerRef = useRef();
   const { data: session } = useSession();
@@ -69,10 +72,10 @@ const GlobelChat = () => {
   const scrollToBottom = () => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      setTimeout(() => {
+        containerRef.current.scrollTop += 100;
+      }, 50);
     }
-    setTimeout(() => {
-      containerRef.current.scrollTop += 100;
-    }, 50);
   };
 
   const handleProfileClick = (index) => {
@@ -106,8 +109,8 @@ const GlobelChat = () => {
         data.status = isActive ? "Online" : "Offline";
       });
     }
-
     setUsersData(res);
+    scrollToBottom()
   };
 
   useEffect(() => {
@@ -130,6 +133,14 @@ const GlobelChat = () => {
       setChatData(res);
     }
   };
+
+  let typingTimeout;
+
+  useEffect(() => {
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+    }, 1000);
+  }, [message]);
 
   useEffect(() => {
     const socket = io("https://globel-chat-server.onrender.com", {
@@ -261,71 +272,81 @@ const GlobelChat = () => {
               </h2>
             </div>
 
-            <main
-              ref={containerRef}
-              className="flex-1 relative overflow-hidden text-sm overflow-y-auto hide-scrollbar"
-            >
-              <div className="w-full bg-myBlack sticky top-0 z-10 flex gap-1 flex-col justify-center items-center p-2 text-center">
-                <p className="text-myBrown">
-                  Hii {sessionData.name.split(" ")[0]} , Leave a Message : )
-                </p>
-                <p className="text-myBrown text-xs">
-                  NOTE : These messages will be stored to DB and can be viewed
-                  by all Viewers !
-                </p>
+            {activeUsers.length ? (
+              <main
+                ref={containerRef}
+                className="flex-1 relative overflow-hidden text-sm overflow-y-auto hide-scrollbar"
+              >
+                <div className="w-full bg-myBlack sticky top-0 z-10 flex gap-1 flex-col justify-center items-center p-2 text-center">
+                  <p className="text-myBrown">
+                    Hii {sessionData.name.split(" ")[0]} , Leave a Message : )
+                  </p>
+                  <p className="text-myBrown text-xs">
+                    NOTE : These messages will be stored to DB and can be viewed
+                    by all Viewers !
+                  </p>
+                </div>
+                <section className="flex justify-end items-end absolute bottom-0 w-full">
+                  {chatData[0] && (
+                    <div className="flex md:pb-0 pb-[4rem] pt-[9rem] max-h-screen flex-col gap-2 m-1 w-full mt-8">
+                      {chatData.map((data, index) => (
+                        <main>
+                          {sessionData?.email !== data.email && (
+                            <div className="self-end">
+                              <section
+                                rows={2}
+                                key={index}
+                                className="bg-myBlack p-2 px-3 rounded-xl rounded-bl-none text-white inline-block whitespace-normal ml-auto max-w-[400px]"
+                                style={{ overflowWrap: "break-word" }}
+                              >
+                                <div className="flex text-xs pr-1 mb-1 gap-3 justify-between">
+                                  <h2 className=" font-semibold text-myGray ">
+                                    {data.name}
+                                  </h2>
+                                  <h2 className="opacity-70 text-[0.65rem]">
+                                    {data.time}
+                                  </h2>
+                                </div>
+                                <p>{data.message}</p>
+                              </section>
+                            </div>
+                          )}
+                          {sessionData?.email === data.email && (
+                            <div className="flex mr-auto">
+                              <section
+                                rows={2}
+                                key={index}
+                                className="bg-myBlack p-2 px-3 rounded-xl rounded-br-none text-white inline-block whitespace-normal ml-auto max-w-[400px] "
+                                style={{ overflowWrap: "break-word" }}
+                              >
+                                <div className="flex text-xs pr-1 mb-1 gap-3 justify-between">
+                                  <h2 className=" font-semibold text-myGray ">
+                                    {data.name}
+                                  </h2>
+                                  <h2 className="opacity-70 text-[0.65rem]">
+                                    {data.time}
+                                  </h2>
+                                </div>
+                                <p>{data.message}</p>
+                              </section>
+                            </div>
+                          )}
+                        </main>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </main>
+            ) : (
+              <div className='h-full w-full flex flex-col justify-center items-center' >
+                <Lottie
+                    className="lg:h-[25%] md:h-[50%]"
+                    autoPlay={true}
+                    animationData={Loading}
+                />
+                <h2 className='font-few text-xl text-myWhite' >Fetching Chat ...</h2>
               </div>
-              <section className="flex justify-end items-end absolute bottom-0 w-full">
-                {chatData[0] && (
-                  <div className="flex md:pb-0 pb-[4rem] pt-[9rem] max-h-screen flex-col gap-2 m-1 w-full mt-8">
-                    {chatData.map((data, index) => (
-                      <main>
-                        {sessionData?.email !== data.email && (
-                          <div className="self-end">
-                            <section
-                              rows={2}
-                              key={index}
-                              className="bg-myBlack p-2 px-3 rounded-xl rounded-bl-none text-white inline-block whitespace-normal ml-auto max-w-[400px]"
-                              style={{ overflowWrap: "break-word" }}
-                            >
-                              <div className="flex text-xs pr-1 mb-1 gap-3 justify-between">
-                                <h2 className=" font-semibold text-myGray ">
-                                  {data.name}
-                                </h2>
-                                <h2 className="opacity-70 text-[0.65rem]">
-                                  {data.time}
-                                </h2>
-                              </div>
-                              <p>{data.message}</p>
-                            </section>
-                          </div>
-                        )}
-                        {sessionData?.email === data.email && (
-                          <div className="flex mr-auto">
-                            <section
-                              rows={2}
-                              key={index}
-                              className="bg-myBlack p-2 px-3 rounded-xl rounded-br-none text-white inline-block whitespace-normal ml-auto max-w-[400px] "
-                              style={{ overflowWrap: "break-word" }}
-                            >
-                              <div className="flex text-xs pr-1 mb-1 gap-3 justify-between">
-                                <h2 className=" font-semibold text-myGray ">
-                                  {data.name}
-                                </h2>
-                                <h2 className="opacity-70 text-[0.65rem]">
-                                  {data.time}
-                                </h2>
-                              </div>
-                              <p>{data.message}</p>
-                            </section>
-                          </div>
-                        )}
-                      </main>
-                    ))}
-                  </div>
-                )}
-              </section>
-            </main>
-
+            )}
             <section className=" overflow-hidden flex justify-center z-20">
               <div
                 style={{
@@ -336,8 +357,10 @@ const GlobelChat = () => {
                 onTouchEnd={handleTouchEnd}
                 className=" overflow-hidden md:sticky fixed w-full"
               >
-                <main className="md:my-[.5rem] my-[1rem] flex flex-col justify-center items-center w-full" >
-                  <span className="md:hidden bg-myGray text-center px-10 font-bold rounded-t-xl" >Drag Me</span>
+                <main className="md:my-[.5rem] my-[1rem] flex flex-col justify-center items-center w-full">
+                  <span className="md:hidden bg-myGray text-center px-10 font-bold rounded-t-xl">
+                    Drag Me
+                  </span>
                   <section className="flex items-center p-3 h-[3rem] border-2 border-myGray w-11/12 rounded-full  mx-auto">
                     <form
                       onSubmit={handleSubmit}

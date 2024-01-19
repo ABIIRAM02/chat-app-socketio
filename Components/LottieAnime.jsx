@@ -5,7 +5,7 @@ import Animi from "../assets/Animation.json";
 const LottieAnime = () => {
   return (
     <Lottie
-    className="lg:h-[75%] md:h-[50%]"
+    className="lg:h-[35rem] md:h-[25rem]"
     loop={false}
     autoPlay={true}
     animationData={Animi}

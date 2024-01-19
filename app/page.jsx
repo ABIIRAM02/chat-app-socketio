@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <section className="h-screen w-full overflow-hidden flex flex-col justify-center items-center relative bg-radial-gradient ">
     <svg
-      className=" absolute lg:-top-28 left-1/2 transform -translate-x-1/2 2xl:w-5/12 xl:w-8/12 md:w-full w-[150vw] md:top-0 top-10"
+      className=" absolute lg:-top-28 left-1/2 transform -translate-x-1/2 lg:w-8/12 md:w-full w-[120vw] top-0"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       xmlLang="en"
